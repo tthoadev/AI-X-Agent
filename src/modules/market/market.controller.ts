@@ -11,8 +11,10 @@ export class MarketController {
     @Query('timeframe') timeframe: string,
     @Query('candleCount') candleCount: number,
   ) {
-    if (!symbol || !timeframe) {
-      return { error: 'Missing required parameters: symbol and timeframe' };
+    if (!symbol || !timeframe || !candleCount) {
+      return {
+        error: 'Missing required parameters: symbol, timeframe and candleCount',
+      };
     }
 
     const candles = await this.marketService.getCandles(

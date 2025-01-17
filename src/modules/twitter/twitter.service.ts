@@ -18,19 +18,17 @@ export class TwitterService {
       const cookies = loadCookiesFromFile();
       if (cookies) {
         await this.scraper.setCookies(cookies);
-        const isLogin = await this.scraper.isLoggedIn();
-        console.log(isLogin);
-        if (!isLogin) {
-          this.logger.warn('Cookies invalid. Logging in...');
-          await this.login();
-        } else {
-          this.logger.log('Logged in using cookies.');
+        if (await this.scraper.isLoggedIn()) {
+          this.logger.verbose('Logged in using cookies.');
+          return;
         }
-      } else {
-        await this.login();
+        this.logger.warn('Cookies invalid. Logging in...');
       }
+      await this.login();
     } catch (error) {
-      console.log('Error: ', error.message);
+      this.logger.error(
+        `Error during scraper initialization: ${error.message}`,
+      );
     }
   }
 
@@ -38,7 +36,7 @@ export class TwitterService {
     const username = process.env.TWITTER_USERNAME;
     const email = process.env.TWITTER_EMAIL;
     const password = process.env.TWITTER_PASSWORD;
-    if (!username || !password) {
+    if (!username || !password || !email) {
       throw new Error(
         'Twitter credentials not found in environment variables.',
       );
