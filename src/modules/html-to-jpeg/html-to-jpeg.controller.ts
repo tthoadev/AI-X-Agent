@@ -12,7 +12,7 @@ export class HtmlToJpegController {
     @Query() query: any,
     @Res() res: Response,
   ): Promise<void> {
-    const baseUrl = 'http://localhost:3000/data-grid';
+    const baseUrl = process.env.BASE_URL_FE + '/data-grid';
     const queryParams = new URLSearchParams(query).toString();
     const url = `${baseUrl}?${queryParams}`;
 
