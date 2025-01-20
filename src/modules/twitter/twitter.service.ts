@@ -47,12 +47,24 @@ export class TwitterService {
     this.logger.log('Logged in and cookies saved.');
   }
 
-  async postTweet(content: string): Promise<void> {
+  async postTweet(
+    content: string,
+    mediaData: { data: Buffer; mediaType: string }[] = [],
+  ): Promise<void> {
     try {
-      await this.scraper.sendTweet(content);
-      this.logger.log(`Tweet posted: "${content}"`);
+      if (mediaData.length > 0) {
+        this.logger.log(
+          `Uploading ${mediaData.length} media files with content: "${content}"`,
+        );
+      } else {
+        this.logger.log(`Sending tweet without media: "${content}"`);
+      }
+
+      await this.scraper.sendTweet(content, undefined, mediaData);
+
+      this.logger.log('Tweet posted successfully!');
     } catch (error) {
-      this.logger.error('Tweet: ', error.message);
+      this.logger.error(`Error posting tweet: ${error.message}`);
     }
   }
 }

@@ -18,7 +18,6 @@ export class MarketService {
   ): Promise<any[]> {
     try {
       const now = Date.now();
-
       const timeframeInMilliseconds =
         this.binance.parseTimeframe(timeframe) * 1000;
       const since = now - candleCount * timeframeInMilliseconds;
@@ -26,12 +25,12 @@ export class MarketService {
       const candles = await this.binance.fetchOHLCV(symbol, timeframe, since);
 
       return candles.map(([timestamp, open, high, low, close, volume]) => ({
-        timestamp: new Date(timestamp).toISOString(),
-        open,
-        high,
-        low,
-        close,
-        volume,
+        timestamp,
+        open: Number(open),
+        high: Number(high),
+        low: Number(low),
+        close: Number(close),
+        volume: Number(volume),
       }));
     } catch (error) {
       throw new Error(`Failed to fetch candles: ${error.message}`);
