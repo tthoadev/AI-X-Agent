@@ -8,6 +8,9 @@ export class MarketService {
   constructor() {
     this.binance = new ccxt.binance({
       enableRateLimit: true,
+      options: {
+        defaultType: 'future',
+      },
     });
   }
 
@@ -15,7 +18,7 @@ export class MarketService {
     symbol: string,
     timeframe: string,
     candleCount: number,
-  ): Promise<any[]> {
+  ): Promise<{ pair: string; candles: any[] }> {
     try {
       const now = Date.now();
       const timeframeInMilliseconds =
@@ -24,14 +27,21 @@ export class MarketService {
 
       const candles = await this.binance.fetchOHLCV(symbol, timeframe, since);
 
-      return candles.map(([timestamp, open, high, low, close, volume]) => ({
-        timestamp,
-        open: Number(open),
-        high: Number(high),
-        low: Number(low),
-        close: Number(close),
-        volume: Number(volume),
-      }));
+      const formattedCandles = candles.map(
+        ([timestamp, open, high, low, close, volume]) => ({
+          timestamp,
+          open: Number(open),
+          high: Number(high),
+          low: Number(low),
+          close: Number(close),
+          volume: Number(volume),
+        }),
+      );
+
+      return {
+        pair: symbol,
+        candles: formattedCandles,
+      };
     } catch (error) {
       throw new Error(`Failed to fetch candles: ${error.message}`);
     }
